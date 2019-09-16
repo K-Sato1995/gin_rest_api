@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -8,10 +9,15 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.GET("/user/:name", func(c *gin.Context) {
-		name := c.Param("name")
-		c.String(http.StatusOK, "Hello %s", name)
-	})
+	router.Use(static.Serve("/", static.LocalFile("./views", true)))
 
-	router.Run()
+	api := router.Group("/api")
+	{
+		api.GET("/", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "pong",
+			})
+		})
+	}
+	router.Run(":8080")
 }
